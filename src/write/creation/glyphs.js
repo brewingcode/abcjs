@@ -164,7 +164,7 @@ var Glyphs = {
 
 	getSymbolWidth: function (symbol) {
 		if (glyphs[symbol]) return glyphs[symbol].w;
-		return 0;
+		throw new Error('symbol not found: ' + symbol);
 	},
 
 	symbolHeightInPitches: function (symbol) {
