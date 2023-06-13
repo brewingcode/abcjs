@@ -33,6 +33,7 @@ function printSymbol(renderer, x, offset, symbol, options) {
 		ycorr = glyphs.getYCorr(symbol);
 		if (elementGroup.isInGroup()) {
 			el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, { "data-name": options.name });
+			console.log('printSymbol(symbol):', symbol);
 		} else {
 			el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, { klass: options.klass, stroke: options.stroke, fill: options.fill, "data-name": options.name });
 		}
