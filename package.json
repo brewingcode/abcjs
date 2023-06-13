@@ -14,7 +14,8 @@
     "test": "concurrently \"http-server\" \"npx opener http://localhost:8080/tests/all.html\"",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
-    "build:analyze": "npm run build:basic -- --env analyze"
+    "build:analyze": "npm run build:basic -- --env analyze",
+    "yoho": "nodemon -e '*' -w src -x ./build-basic"
   },
   "repository": {
     "type": "git",
@@ -52,6 +53,7 @@
     "concurrently": "7.6.0",
     "http-server": "14.1.1",
     "mocha": "10.2.0",
+    "nodemon": "^2.0.22",
     "opener": "1.5.2",
     "vuepress": "2.0.0-beta.60",
     "vuex": "4.1.0",

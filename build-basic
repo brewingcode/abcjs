@@ -1,0 +1,4 @@
+#!/bin/bash
+[ -n "$SHANTIES" ] || { echo "set \$SHANTIES env var to your shanties repo root" >&2; exit 1; }
+source ~/.bashrc
+npm run build:basic && cp "$(git rev-parse --show-toplevel)/dist/abcjs-basic.js" "$SHANTIES/src"
