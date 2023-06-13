@@ -1,4 +1,5 @@
 var spacing = require('../helpers/spacing');
+var sprintf = require('../draw/sprintf');
 
 /**
  * Glyphs and some methods to adjust for their x and y baseline
@@ -140,7 +141,15 @@ var Glyphs = {
 		attrs.path = path;
 		return paper.path(attrs);
 	},
-
+	printCircle: function(x, y, r, paper, attrs) {
+		attrs.path = [
+			sprintf("M %0.2f, %0.2f", x, y),
+			sprintf("a %0.2f,%0.2f 0 1,0 %0.2f,0", r, r, r*2),
+			sprintf("a %0.2f,%0.2f 0 1,0 -%0.2f,0", r, r, r*2)
+		].join(" ")
+		console.log('Glyphs.printCircle:', paper, attrs)
+		return paper.path(attrs);
+	},
 	getPathForSymbol: function (x, y, symb, scalex, scaley) {
 		scalex = scalex || 1;
 		scaley = scaley || 1;
