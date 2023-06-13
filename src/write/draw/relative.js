@@ -72,7 +72,6 @@ function drawRelativeElement(renderer, params, bartop) {
 	if (params.scalex !== 1 && params.graphelem) {
 		scaleExistingElem(renderer.paper, params.graphelem, params.scalex, params.scaley, params.x, y);
 	}
-	return params.graphelem;
 }
 
 function scaleExistingElem(paper, elem, scaleX, scaleY, x, y) {
