@@ -7,6 +7,7 @@ function drawRelativeElement(renderer, params, bartop) {
 	if (params.pitch === undefined)
 		window.console.error(params.type + " Relative Element y-coordinate not set.");
 	var y = renderer.calcY(params.pitch);
+	console.log('drawRelativeElement(params):', params);
 	switch (params.type) {
 		case "symbol":
 			if (params.c === null) return null;
@@ -20,6 +21,9 @@ function drawRelativeElement(renderer, params, bartop) {
 				//				stroke: renderer.foregroundColor,
 				name: params.name
 			});
+			if (params.c.match(/^noteheads/)) {
+				renderText(renderer, { x: params.x, y: params.pitch, text: params.name, type: 'annotationfont', klass: renderer.controller.classes.generate('annotation'), anchor: "middle", centerVertically: true, dim: params.dim, cursor: 'default' }, false);
+			}
 			break;
 		case "debug":
 			params.graphelem = renderText(renderer, { x: params.x, y: renderer.calcY(15), text: "" + params.c, type: "debugfont", klass: renderer.controller.classes.generate('debug-msg'), anchor: 'start', centerVertically: false, dim: params.dim }, false);
