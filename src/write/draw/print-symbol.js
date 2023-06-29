@@ -35,7 +35,7 @@ function printSymbol(renderer, x, offset, symbol, options) {
 			el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, { "data-name": options.name });
 			console.log('printSymbol(symbol):', symbol);
 			if (symbol.match(/^noteheads/)) {
-				var r = 3;
+				var r = 4.0;
 				glyphs.printCircle(
 					x + glyphs.getSymbolWidth(symbol)/2 - r,
 					renderer.calcY(offset + ycorr),

@@ -130,9 +130,13 @@ var pathScale = function (pathArray, kx, ky) {
 };
 
 var Glyphs = {
+	noteheadScale: 1.33,
 	printSymbol: function (x, y, symb, paper, attrs) {
 		if (!glyphs[symb]) return null;
 		var pathArray = pathClone(glyphs[symb].d);
+		if (symb.match(/^noteheads/)) {
+			pathScale(pathArray, Glyphs.noteheadScale, Glyphs.noteheadScale)
+		}
 		pathArray[0][1] += x;
 		pathArray[0][2] += y;
 		var path = "";
@@ -163,8 +167,12 @@ var Glyphs = {
 	},
 
 	getSymbolWidth: function (symbol) {
-		if (glyphs[symbol]) return glyphs[symbol].w;
-		throw new Error('symbol not found: ' + symbol);
+		if (!glyphs[symbol]) throw new Error('symbol not found: ' + symbol);
+		var w = glyphs[symbol].w;
+		if (symbol.match(/^noteheads/)) {
+			w *= Glyphs.noteheadScale;
+		}
+		return w;
 	},
 
 	symbolHeightInPitches: function (symbol) {
