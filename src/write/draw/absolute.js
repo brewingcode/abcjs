@@ -8,6 +8,7 @@ function drawAbsolute(renderer, params, bartop, selectables, staffPos) {
 	if (params.invisible) return;
 	var isTempo = params.children.length > 0 && params.children[0].type === "TempoElement";
 	params.elemset = [];
+	var deferSymbols = [];
 	elementGroup.beginGroup(renderer.paper, renderer.controller);
 	for (var i = 0; i < params.children.length; i++) {
 		var child = params.children[i];
@@ -15,9 +16,15 @@ function drawAbsolute(renderer, params, bartop, selectables, staffPos) {
 			case "TempoElement":
 				drawTempo(renderer, child);
 				break;
+			case "symbol":
+				deferSymbols.push(child);
+				break;
 			default:
 				drawRelativeElement(renderer, child, bartop);
 		}
+	}
+	for (var i = 0; i < deferSymbols.length; i++) {
+		drawRelativeElement(renderer, deferSymbols[i], bartop);
 	}
 	var klass = params.type;
 	if (params.type === 'note' || params.type === 'rest') {
