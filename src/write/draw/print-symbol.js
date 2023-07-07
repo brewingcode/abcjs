@@ -41,7 +41,7 @@ function printSymbol(renderer, x, offset, symbol, options) {
 					renderer.calcY(offset + ycorr),
 					r,
 					renderer.paper,
-					{ fill: "green" }
+					{ fill: "white" }
 				);
 			}
 		} else {
