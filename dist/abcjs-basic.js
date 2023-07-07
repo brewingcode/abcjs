@@ -3523,6 +3523,13 @@ var parseDirective = {};
       style: "normal",
       decoration: "none"
     };
+    tune.formatting.notelabelfont = {
+      face: "\"Times New Roman\"",
+      size: 7,
+      weight: "bold",
+      style: "normal",
+      decoration: "none"
+    };
 
     // these are the default fonts for these element types. In the printer, these fonts might change as the tune progresses.
     tune.formatting.annotationfont = multilineVars.annotationfont;
@@ -20216,6 +20223,7 @@ module.exports = VoiceElement;
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var spacing = __webpack_require__(/*! ../helpers/spacing */ "./src/write/helpers/spacing.js");
+var sprintf = __webpack_require__(/*! ../draw/sprintf */ "./src/write/draw/sprintf.js");
 
 /**
  * Glyphs and some methods to adjust for their x and y baseline
@@ -20719,9 +20727,13 @@ var pathScale = function pathScale(pathArray, kx, ky) {
   }
 };
 var Glyphs = {
+  noteheadScale: 1.33,
   printSymbol: function printSymbol(x, y, symb, paper, attrs) {
     if (!glyphs[symb]) return null;
     var pathArray = pathClone(glyphs[symb].d);
+    if (symb.match(/^noteheads/)) {
+      pathScale(pathArray, Glyphs.noteheadScale, Glyphs.noteheadScale);
+    }
     pathArray[0][1] += x;
     pathArray[0][2] += y;
     var path = "";
@@ -20729,6 +20741,11 @@ var Glyphs = {
       path += pathArray[i].join(" ");
     }
     attrs.path = path;
+    return paper.path(attrs);
+  },
+  printCircle: function printCircle(x, y, r, paper, attrs) {
+    attrs.path = [sprintf("M %0.2f, %0.2f", x, y), sprintf("a %0.2f,%0.2f 0 1,0 %0.2f,0", r, r, r * 2), sprintf("a %0.2f,%0.2f 0 1,0 -%0.2f,0", r, r, r * 2)].join(" ");
+    console.log('Glyphs.printCircle:', paper, attrs);
     return paper.path(attrs);
   },
   getPathForSymbol: function getPathForSymbol(x, y, symb, scalex, scaley) {
@@ -20742,8 +20759,12 @@ var Glyphs = {
     return pathArray;
   },
   getSymbolWidth: function getSymbolWidth(symbol) {
-    if (glyphs[symbol]) return glyphs[symbol].w;
-    return 0;
+    if (!glyphs[symbol]) throw new Error('symbol not found: ' + symbol);
+    var w = glyphs[symbol].w;
+    if (symbol.match(/^noteheads/)) {
+      w *= Glyphs.noteheadScale;
+    }
+    return w;
   },
   symbolHeightInPitches: function symbolHeightInPitches(symbol) {
     var height = glyphs[symbol] ? glyphs[symbol].h : 0;
@@ -20888,6 +20909,7 @@ function drawAbsolute(renderer, params, bartop, selectables, staffPos) {
   if (params.invisible) return;
   var isTempo = params.children.length > 0 && params.children[0].type === "TempoElement";
   params.elemset = [];
+  var deferSymbols = [];
   elementGroup.beginGroup(renderer.paper, renderer.controller);
   for (var i = 0; i < params.children.length; i++) {
     var child = params.children[i];
@@ -20895,9 +20917,15 @@ function drawAbsolute(renderer, params, bartop, selectables, staffPos) {
       case "TempoElement":
         drawTempo(renderer, child);
         break;
+      case "symbol":
+        deferSymbols.push(child);
+        break;
       default:
         drawRelativeElement(renderer, child, bartop);
     }
+  }
+  for (var i = 0; i < deferSymbols.length; i++) {
+    drawRelativeElement(renderer, deferSymbols[i], bartop);
   }
   var klass = params.type;
   if (params.type === 'note' || params.type === 'rest') {
@@ -21721,6 +21749,13 @@ function printSymbol(renderer, x, offset, symbol, options) {
       el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, {
         "data-name": options.name
       });
+      console.log('printSymbol(symbol):', symbol);
+      if (symbol.match(/^noteheads/)) {
+        var r = 4.0;
+        glyphs.printCircle(x + glyphs.getSymbolWidth(symbol) / 2 - r, renderer.calcY(offset + ycorr), r, renderer.paper, {
+          fill: "white"
+        });
+      }
     } else {
       el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, {
         klass: options.klass,
@@ -21768,6 +21803,7 @@ var printSymbol = __webpack_require__(/*! ./print-symbol */ "./src/write/draw/pr
 function drawRelativeElement(renderer, params, bartop) {
   if (params.pitch === undefined) window.console.error(params.type + " Relative Element y-coordinate not set.");
   var y = renderer.calcY(params.pitch);
+  console.log('drawRelativeElement(params):', params);
   switch (params.type) {
     case "symbol":
       if (params.c === null) return null;
@@ -21781,6 +21817,22 @@ function drawRelativeElement(renderer, params, bartop) {
         //				stroke: renderer.foregroundColor,
         name: params.name
       });
+      if (params.c.match(/^noteheads/)) {
+        var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
+        var x = params.x + params.height * 0.8; // the width takes into account sharp/flat/natural (^/=/_)
+        var y = renderer.calcY(params.pitch) + params.height * 0.7;
+        renderText(renderer, {
+          x: x,
+          y: y,
+          text: note,
+          color: "black",
+          type: 'notelabelfont',
+          klass: renderer.controller.classes.generate('notelabelfont'),
+          anchor: "start",
+          centerVertically: true,
+          cursor: 'default'
+        }, false);
+      }
       break;
     case "debug":
       params.graphelem = renderText(renderer, {
@@ -21918,7 +21970,6 @@ function drawRelativeElement(renderer, params, bartop) {
   if (params.scalex !== 1 && params.graphelem) {
     scaleExistingElem(renderer.paper, params.graphelem, params.scalex, params.scaley, params.x, y);
   }
-  return params.graphelem;
 }
 function scaleExistingElem(paper, elem, scaleX, scaleY, x, y) {
   paper.setAttributeOnElement(elem, {
@@ -22583,6 +22634,9 @@ function renderText(renderer, params, alreadyInGroup) {
   }
   if (params.cursor) {
     hash.attr.cursor = params.cursor;
+  }
+  if (params.color) {
+    hash.attr.fill = params.color;
   }
   var text = params.text.replace(/\n\n/g, "\n \n");
   text = text.replace(/^\n/, "\xA0\n");

@@ -27,6 +27,10 @@ function renderText(renderer, params, alreadyInGroup) {
 		hash.attr.cursor = params.cursor;
 	}
 
+	if (params.color) {
+		hash.attr.fill = params.color;
+	}
+
 	var text = params.text.replace(/\n\n/g, "\n \n");
 	text = text.replace(/^\n/, "\xA0\n");
 
