@@ -51,6 +51,11 @@ function renderText(renderer, params, alreadyInGroup) {
 	hash.attr.y = roundNumber(hash.attr.y);
 	if (params.name)
 		hash.attr["data-name"] = params.name;
+
+	if (params.type == 'notelabelfont' && params.color != 'white') {
+		hash.attr.stroke = 'white';
+		hash.attr['stroke-width'] = 0.5;
+	}
 	var elem = renderer.paper.text(text, hash.attr);
 	if (hash.font.box) {
 		var size = elem.getBBox();

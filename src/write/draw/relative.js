@@ -23,9 +23,10 @@ function drawRelativeElement(renderer, params, bartop) {
 			});
 			if (params.c.match(/^noteheads/)) {
 				var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
-				var x = params.x + params.height*0.8; // the width takes into account sharp/flat/natural (^/=/_)
-				var y = renderer.calcY(params.pitch) + params.height*0.7;
-				renderText(renderer, { x: x, y: y, text: note, color:"black", type: 'notelabelfont', klass: renderer.controller.classes.generate('notelabelfont'), anchor: "start", centerVertically: true, cursor: 'default' }, false);
+				var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
+				var y = renderer.calcY(params.pitch) + 3.3;
+				var color = params.parent.duration >= 0.5 ? "black" : "white";
+				renderText(renderer, { x: x, y: y, text: note, color: color, type: 'notelabelfont', klass: renderer.controller.classes.generate('notelabelfont'), anchor: "start", centerVertically: true, cursor: 'default' }, false);
 			}
 			break;
 		case "debug":
