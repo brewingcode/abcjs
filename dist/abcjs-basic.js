@@ -21819,13 +21819,14 @@ function drawRelativeElement(renderer, params, bartop) {
       });
       if (params.c.match(/^noteheads/)) {
         var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
-        var x = params.x + params.height * 0.8; // the width takes into account sharp/flat/natural (^/=/_)
-        var y = renderer.calcY(params.pitch) + params.height * 0.7;
+        var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
+        var y = renderer.calcY(params.pitch) + 3.3;
+        var color = params.parent.duration >= 0.5 ? "black" : "white";
         renderText(renderer, {
           x: x,
           y: y,
           text: note,
-          color: "black",
+          color: color,
           type: 'notelabelfont',
           klass: renderer.controller.classes.generate('notelabelfont'),
           anchor: "start",
@@ -22658,6 +22659,10 @@ function renderText(renderer, params, alreadyInGroup) {
   hash.attr.x = roundNumber(hash.attr.x);
   hash.attr.y = roundNumber(hash.attr.y);
   if (params.name) hash.attr["data-name"] = params.name;
+  if (params.type == 'notelabelfont' && params.color != 'white') {
+    hash.attr.stroke = 'white';
+    hash.attr['stroke-width'] = 0.5;
+  }
   var elem = renderer.paper.text(text, hash.attr);
   if (hash.font.box) {
     var size = elem.getBBox();
