@@ -106,6 +106,7 @@ var Parse = function() {
 			this.openSlurs = [];
 			this.freegchord = false;
 			this.endingHoldOver = {};
+			this.notescaling = 1.0;
 		},
 		differentFont: function(type, defaultFonts) {
 			if (this[type].decoration !== defaultFonts[type].decoration) return true;

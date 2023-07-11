@@ -170,7 +170,6 @@ var Glyphs = {
 		var w = glyphs[symbol].w;
 		if (symbol.match(/^noteheads/)) {
 			console.log('w:', w, 'scaled w:', w*Glyphs.noteheadScale)
-			w *= 1.33;
 		}
 		return w;
 	},
