@@ -21,7 +21,7 @@ function drawRelativeElement(renderer, params, bartop) {
 				//				stroke: renderer.foregroundColor,
 				name: params.name
 			});
-			if (params.c.match(/^noteheads/)) {
+			if (params.c.match(/^noteheads/) && renderer.shownotelabels) {
 				var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
 				var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
 				var y = renderer.calcY(params.pitch) + 3.3;
