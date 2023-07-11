@@ -1145,6 +1145,10 @@ var parseDirective = {};
 				// TODO-PER: Actually handle the parameters of these
 				tune.formatting[cmd] = restOfString;
 				break;
+			case "shownotelabels":
+				scratch = addMultilineVarBool('shownotelabels', cmd, tokens);
+				if (scratch !== null) return scratch;
+				break;
 			default:
 				return "Unknown directive: " + cmd;
 		}
