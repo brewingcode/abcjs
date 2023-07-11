@@ -42,7 +42,6 @@ function printSymbol(renderer, x, offset, symbol, options) {
 				attrs.notescaling = options.notescaling;
 			}
 			el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, attrs);
-			console.log('printSymbol(symbol):', symbol);
 		} else {
 			el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, { klass: options.klass, stroke: options.stroke, fill: options.fill, "data-name": options.name });
 		}

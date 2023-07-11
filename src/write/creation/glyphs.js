@@ -150,7 +150,6 @@ var Glyphs = {
 			sprintf("a %0.2f,%0.2f 0 1,0 %0.2f,0", r, r, r*2),
 			sprintf("a %0.2f,%0.2f 0 1,0 -%0.2f,0", r, r, r*2)
 		].join(" ")
-		console.log('Glyphs.printCircle:', paper, attrs)
 		return paper.path(attrs);
 	},
 	getPathForSymbol: function (x, y, symb, scalex, scaley) {
@@ -167,11 +166,7 @@ var Glyphs = {
 
 	getSymbolWidth: function (symbol) {
 		if (!glyphs[symbol]) throw new Error('symbol not found: ' + symbol);
-		var w = glyphs[symbol].w;
-		if (symbol.match(/^noteheads/)) {
-			console.log('w:', w, 'scaled w:', w*Glyphs.noteheadScale)
-		}
-		return w;
+		return glyphs[symbol].w;
 	},
 
 	symbolHeightInPitches: function (symbol) {

@@ -20,7 +20,6 @@ function drawRelativeElement(renderer, params, bartop) {
 	if (params.pitch === undefined)
 		window.console.error(params.type + " Relative Element y-coordinate not set.");
 	var y = renderer.calcY(params.pitch);
-	console.log('drawRelativeElement(params):', params);
 	switch (params.type) {
 		case "symbol":
 			if (params.c === null) return null;
