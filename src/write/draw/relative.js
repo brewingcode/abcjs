@@ -3,6 +3,19 @@ var printStem = require('./print-stem');
 var printStaffLine = require('./staff-line');
 var printSymbol = require('./print-symbol');
 
+function getColor(note, renderer) {
+	var colors = {
+		A: 'red',
+		B: 'orange',
+		C: 'yellowgreen',
+		D: 'green',
+		E: 'blue',
+		F: 'indigo',
+		G: 'darkviolet',
+	};
+	return renderer.colornotes ? colors[note] : undefined;
+}
+
 function drawRelativeElement(renderer, params, bartop) {
 	if (params.pitch === undefined)
 		window.console.error(params.type + " Relative Element y-coordinate not set.");
@@ -12,17 +25,16 @@ function drawRelativeElement(renderer, params, bartop) {
 		case "symbol":
 			if (params.c === null) return null;
 			var klass = "symbol";
+			var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
 			if (params.klass) klass += " " + params.klass;
 			params.graphelem = printSymbol(renderer, params.x, params.pitch, params.c, {
 				scalex: params.scalex,
 				scaley: params.scaley,
 				klass: renderer.controller.classes.generate(klass),
-				//				fill:"none",
-				//				stroke: renderer.foregroundColor,
+				color: getColor(note, renderer),
 				name: params.name
 			});
 			if (params.c.match(/^noteheads/) && renderer.shownotelabels) {
-				var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
 				var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
 				var y = renderer.calcY(params.pitch) + 3.3;
 				var color = params.parent.duration >= 0.5 ? "black" : "white";

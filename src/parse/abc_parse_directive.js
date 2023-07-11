@@ -1149,6 +1149,10 @@ var parseDirective = {};
 				scratch = addMultilineVarBool('shownotelabels', cmd, tokens);
 				if (scratch !== null) return scratch;
 				break;
+			case "colornotes":
+				scratch = addMultilineVarBool('colornotes', cmd, tokens);
+				if (scratch !== null) return scratch;
+				break;
 			default:
 				return "Unknown directive: " + cmd;
 		}

@@ -2700,6 +2700,8 @@ var Parse = function Parse() {
       metaText: tune.metaText,
       metaTextInfo: tune.metaTextInfo,
       version: tune.version,
+      shownotelabels: multilineVars.shownotelabels,
+      colornotes: multilineVars.colornotes,
       addElementToEvents: tune.addElementToEvents,
       addUsefulCallbackInfo: tune.addUsefulCallbackInfo,
       getTotalTime: tune.getTotalTime,
@@ -3524,7 +3526,7 @@ var parseDirective = {};
       decoration: "none"
     };
     tune.formatting.notelabelfont = {
-      face: "\"Times New Roman\"",
+      face: "\"Arial\"",
       size: 7,
       weight: "bold",
       style: "normal",
@@ -4645,6 +4647,14 @@ var parseDirective = {};
       case "nobarcheck":
         // TODO-PER: Actually handle the parameters of these
         tune.formatting[cmd] = restOfString;
+        break;
+      case "shownotelabels":
+        scratch = addMultilineVarBool('shownotelabels', cmd, tokens);
+        if (scratch !== null) return scratch;
+        break;
+      case "colornotes":
+        scratch = addMultilineVarBool('colornotes', cmd, tokens);
+        if (scratch !== null) return scratch;
         break;
       default:
         return "Unknown directive: " + cmd;
@@ -21746,16 +21756,14 @@ function printSymbol(renderer, x, offset, symbol, options) {
   } else {
     ycorr = glyphs.getYCorr(symbol);
     if (elementGroup.isInGroup()) {
-      el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, {
-        "data-name": options.name
-      });
-      console.log('printSymbol(symbol):', symbol);
-      if (symbol.match(/^noteheads/)) {
-        var r = 4.0;
-        glyphs.printCircle(x + glyphs.getSymbolWidth(symbol) / 2 - r, renderer.calcY(offset + ycorr), r, renderer.paper, {
-          fill: "white"
-        });
+      var attrs = {
+        'data-name': options.name
+      };
+      if (options.color) {
+        attrs.fill = options.color;
       }
+      el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, attrs);
+      console.log('printSymbol(symbol):', symbol);
     } else {
       el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, {
         klass: options.klass,
@@ -21800,6 +21808,18 @@ var renderText = __webpack_require__(/*! ./text */ "./src/write/draw/text.js");
 var printStem = __webpack_require__(/*! ./print-stem */ "./src/write/draw/print-stem.js");
 var printStaffLine = __webpack_require__(/*! ./staff-line */ "./src/write/draw/staff-line.js");
 var printSymbol = __webpack_require__(/*! ./print-symbol */ "./src/write/draw/print-symbol.js");
+function getColor(note, renderer) {
+  var colors = {
+    A: 'red',
+    B: 'orange',
+    C: 'yellowgreen',
+    D: 'green',
+    E: 'blue',
+    F: 'indigo',
+    G: 'darkviolet'
+  };
+  return renderer.colornotes ? colors[note] : undefined;
+}
 function drawRelativeElement(renderer, params, bartop) {
   if (params.pitch === undefined) window.console.error(params.type + " Relative Element y-coordinate not set.");
   var y = renderer.calcY(params.pitch);
@@ -21808,17 +21828,16 @@ function drawRelativeElement(renderer, params, bartop) {
     case "symbol":
       if (params.c === null) return null;
       var klass = "symbol";
+      var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
       if (params.klass) klass += " " + params.klass;
       params.graphelem = printSymbol(renderer, params.x, params.pitch, params.c, {
         scalex: params.scalex,
         scaley: params.scaley,
         klass: renderer.controller.classes.generate(klass),
-        //				fill:"none",
-        //				stroke: renderer.foregroundColor,
+        color: getColor(note, renderer),
         name: params.name
       });
-      if (params.c.match(/^noteheads/)) {
-        var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
+      if (params.c.match(/^noteheads/) && renderer.shownotelabels) {
         var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
         var y = renderer.calcY(params.pitch) + 3.3;
         var color = params.parent.duration >= 0.5 ? "black" : "white";
@@ -25126,6 +25145,8 @@ Renderer.prototype.newTune = function (abcTune) {
   //this.noteNumber = null;
   this.isPrint = abcTune.media === 'print';
   this.setPadding(abcTune);
+  this.shownotelabels = abcTune.shownotelabels;
+  this.colornotes = abcTune.colornotes;
 };
 Renderer.prototype.setLineThickness = function (lineThickness) {
   this.lineThickness = lineThickness;
