@@ -13,7 +13,7 @@ function getColor(note, renderer) {
 		F: 'indigo',
 		G: 'darkviolet',
 	};
-	return renderer.colornotes ? colors[note] : undefined;
+	return renderer.notecolors ? colors[note] : undefined;
 }
 
 function drawRelativeElement(renderer, params, bartop) {
@@ -34,7 +34,7 @@ function drawRelativeElement(renderer, params, bartop) {
 				color: getColor(note, renderer),
 				name: params.name
 			});
-			if (params.c.match(/^noteheads/) && renderer.shownotelabels) {
+			if (params.c.match(/^noteheads/) && renderer.notelabels) {
 				var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
 				var y = renderer.calcY(params.pitch) + 3.3;
 				var color = params.parent.duration >= 0.5 ? "black" : "white";
