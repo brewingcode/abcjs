@@ -37,6 +37,7 @@ Renderer.prototype.newTune = function (abcTune) {
 	//this.noteNumber = null;
 	this.isPrint = abcTune.media === 'print';
 	this.setPadding(abcTune);
+	this.shownotelabels = abcTune.shownotelabels;
 };
 
 Renderer.prototype.setLineThickness = function (lineThickness) {
