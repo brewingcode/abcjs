@@ -1153,6 +1153,10 @@ var parseDirective = {};
 				scratch = addMultilineVarBool('notecolors', cmd, tokens);
 				if (scratch !== null) return scratch;
 				break;
+			case "notescaling":
+				// addMultilineVar doesn't handle floats properly and I don't wanna mess with it
+				multilineVars[cmd] = tokens[0].floatt
+				break;
 			default:
 				return "Unknown directive: " + cmd;
 		}

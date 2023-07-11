@@ -38,6 +38,9 @@ function printSymbol(renderer, x, offset, symbol, options) {
 			if (options.color) {
 				attrs.fill = options.color;
 			}
+			if (symbol.match(/^noteheads/) && options.notescaling) {
+				attrs.notescaling = options.notescaling;
+			}
 			el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, attrs);
 			console.log('printSymbol(symbol):', symbol);
 		} else {

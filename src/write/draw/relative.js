@@ -32,10 +32,12 @@ function drawRelativeElement(renderer, params, bartop) {
 				scaley: params.scaley,
 				klass: renderer.controller.classes.generate(klass),
 				color: getColor(note, renderer),
-				name: params.name
+				name: params.name,
+				notescaling: renderer.notescaling,
 			});
 			if (params.c.match(/^noteheads/) && renderer.notelabels) {
-				var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
+				var scale = typeof renderer.notescaling == 'undefined' ? 0.7 : renderer.notescaling;
+				var x = params.x + 2.5 * scale; // the width takes into account sharp/flat/natural (^/=/_)
 				var y = renderer.calcY(params.pitch) + 3.3;
 				var color = params.parent.duration >= 0.5 ? "black" : "white";
 				renderText(renderer, { x: x, y: y, text: note, color: color, type: 'notelabelfont', klass: renderer.controller.classes.generate('notelabelfont'), anchor: "start", centerVertically: true, cursor: 'default' }, false);

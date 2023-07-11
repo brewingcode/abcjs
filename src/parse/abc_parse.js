@@ -28,6 +28,7 @@ var Parse = function() {
 			version: tune.version,
 			notelabels: multilineVars.notelabels,
 			notecolors: multilineVars.notecolors,
+			notescaling: multilineVars.notescaling,
 
 			addElementToEvents: tune.addElementToEvents,
 			addUsefulCallbackInfo: tune.addUsefulCallbackInfo,
