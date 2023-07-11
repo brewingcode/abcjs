@@ -2700,8 +2700,9 @@ var Parse = function Parse() {
       metaText: tune.metaText,
       metaTextInfo: tune.metaTextInfo,
       version: tune.version,
-      shownotelabels: multilineVars.shownotelabels,
-      colornotes: multilineVars.colornotes,
+      notelabels: multilineVars.notelabels,
+      notecolors: multilineVars.notecolors,
+      notescaling: multilineVars.notescaling,
       addElementToEvents: tune.addElementToEvents,
       addUsefulCallbackInfo: tune.addUsefulCallbackInfo,
       getTotalTime: tune.getTotalTime,
@@ -2781,6 +2782,7 @@ var Parse = function Parse() {
       this.openSlurs = [];
       this.freegchord = false;
       this.endingHoldOver = {};
+      this.notescaling = 1.0;
     },
     differentFont: function differentFont(type, defaultFonts) {
       if (this[type].decoration !== defaultFonts[type].decoration) return true;
@@ -4648,12 +4650,13 @@ var parseDirective = {};
         // TODO-PER: Actually handle the parameters of these
         tune.formatting[cmd] = restOfString;
         break;
-      case "shownotelabels":
-        scratch = addMultilineVarBool('shownotelabels', cmd, tokens);
+      case "notelabels":
+        scratch = addMultilineVarBool('notelabels', cmd, tokens);
+        multilineVars['notescaling'] = 1.3;
         if (scratch !== null) return scratch;
         break;
-      case "colornotes":
-        scratch = addMultilineVarBool('colornotes', cmd, tokens);
+      case "notecolors":
+        scratch = addMultilineVarBool('notecolors', cmd, tokens);
         if (scratch !== null) return scratch;
         break;
       default:
@@ -20737,12 +20740,11 @@ var pathScale = function pathScale(pathArray, kx, ky) {
   }
 };
 var Glyphs = {
-  noteheadScale: 1.33,
   printSymbol: function printSymbol(x, y, symb, paper, attrs) {
     if (!glyphs[symb]) return null;
     var pathArray = pathClone(glyphs[symb].d);
-    if (symb.match(/^noteheads/)) {
-      pathScale(pathArray, Glyphs.noteheadScale, Glyphs.noteheadScale);
+    if (symb.match(/^noteheads/) && attrs.notescaling) {
+      pathScale(pathArray, attrs.notescaling, attrs.notescaling);
     }
     pathArray[0][1] += x;
     pathArray[0][2] += y;
@@ -20755,7 +20757,6 @@ var Glyphs = {
   },
   printCircle: function printCircle(x, y, r, paper, attrs) {
     attrs.path = [sprintf("M %0.2f, %0.2f", x, y), sprintf("a %0.2f,%0.2f 0 1,0 %0.2f,0", r, r, r * 2), sprintf("a %0.2f,%0.2f 0 1,0 -%0.2f,0", r, r, r * 2)].join(" ");
-    console.log('Glyphs.printCircle:', paper, attrs);
     return paper.path(attrs);
   },
   getPathForSymbol: function getPathForSymbol(x, y, symb, scalex, scaley) {
@@ -20770,11 +20771,7 @@ var Glyphs = {
   },
   getSymbolWidth: function getSymbolWidth(symbol) {
     if (!glyphs[symbol]) throw new Error('symbol not found: ' + symbol);
-    var w = glyphs[symbol].w;
-    if (symbol.match(/^noteheads/)) {
-      w *= Glyphs.noteheadScale;
-    }
-    return w;
+    return glyphs[symbol].w;
   },
   symbolHeightInPitches: function symbolHeightInPitches(symbol) {
     var height = glyphs[symbol] ? glyphs[symbol].h : 0;
@@ -21762,8 +21759,10 @@ function printSymbol(renderer, x, offset, symbol, options) {
       if (options.color) {
         attrs.fill = options.color;
       }
+      if (symbol.match(/^noteheads/) && options.notescaling) {
+        attrs.notescaling = options.notescaling;
+      }
       el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, attrs);
-      console.log('printSymbol(symbol):', symbol);
     } else {
       el = glyphs.printSymbol(x, renderer.calcY(offset + ycorr), symbol, renderer.paper, {
         klass: options.klass,
@@ -21818,12 +21817,11 @@ function getColor(note, renderer) {
     F: 'indigo',
     G: 'darkviolet'
   };
-  return renderer.colornotes ? colors[note] : undefined;
+  return renderer.notecolors ? colors[note] : undefined;
 }
 function drawRelativeElement(renderer, params, bartop) {
   if (params.pitch === undefined) window.console.error(params.type + " Relative Element y-coordinate not set.");
   var y = renderer.calcY(params.pitch);
-  console.log('drawRelativeElement(params):', params);
   switch (params.type) {
     case "symbol":
       if (params.c === null) return null;
@@ -21835,10 +21833,11 @@ function drawRelativeElement(renderer, params, bartop) {
         scaley: params.scaley,
         klass: renderer.controller.classes.generate(klass),
         color: getColor(note, renderer),
-        name: params.name
+        name: params.name,
+        notescaling: renderer.notelabels ? 1.33 : undefined
       });
-      if (params.c.match(/^noteheads/) && renderer.shownotelabels) {
-        var x = params.x + 3.3; // the width takes into account sharp/flat/natural (^/=/_)
+      if (params.c.match(/^noteheads/) && renderer.notelabels) {
+        var x = params.x + 3.3;
         var y = renderer.calcY(params.pitch) + 3.3;
         var color = params.parent.duration >= 0.5 ? "black" : "white";
         renderText(renderer, {
@@ -22497,6 +22496,9 @@ module.exports = drawStaffGroup;
 var printLine = __webpack_require__(/*! ./print-line */ "./src/write/draw/print-line.js");
 function printStaffLine(renderer, x1, x2, pitch, klass, name, dy) {
   var y = renderer.calcY(pitch);
+  if (name == 'ledger' && renderer.notelabels) {
+    x2 = x1 + (x2 - x1) * 1.33;
+  }
   return printLine(renderer, x1, x2, y, klass, name, dy);
 }
 module.exports = printStaffLine;
@@ -25145,8 +25147,9 @@ Renderer.prototype.newTune = function (abcTune) {
   //this.noteNumber = null;
   this.isPrint = abcTune.media === 'print';
   this.setPadding(abcTune);
-  this.shownotelabels = abcTune.shownotelabels;
-  this.colornotes = abcTune.colornotes;
+  this.notelabels = abcTune.notelabels;
+  this.notecolors = abcTune.notecolors;
+  this.notescaling = abcTune.notescaling;
 };
 Renderer.prototype.setLineThickness = function (lineThickness) {
   this.lineThickness = lineThickness;
