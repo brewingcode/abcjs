@@ -10,6 +10,9 @@ function printStem(renderer, x, dx, y1, y2, klass, name) {
 		y1 = roundNumber(y1);
 		y2 = roundNumber(y2);
 	}
+	if (renderer.notelabels && dx < 0) {
+		x += 3.5
+	}
 	x = roundNumber(x);
 	var x2 = roundNumber(x + dx);
 	// TODO-PER: This fixes a firefox bug where it isn't displayed
