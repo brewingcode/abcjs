@@ -31,6 +31,10 @@ function printSymbol(renderer, x, offset, symbol, options) {
 		return g;
 	} else {
 		ycorr = glyphs.getYCorr(symbol);
+		if (symbol.match(/^flags/)) {
+			// not sure why flags in particular need to be offset here
+			x += 3.5;
+		}
 		if (elementGroup.isInGroup()) {
 			var attrs = {
 				'data-name': options.name
