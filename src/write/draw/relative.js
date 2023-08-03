@@ -27,6 +27,10 @@ function drawRelativeElement(renderer, params, bartop) {
 			var klass = "symbol";
 			var note = params.name.replace(/[^abcdefg]/gi, '').toUpperCase();
 			if (params.klass) klass += " " + params.klass;
+
+			if (params.c.match(/^flags/) && params.parent.heads[0].stemDir == "up") {
+				params.x += 3.5;
+			}
 			params.graphelem = printSymbol(renderer, params.x, params.pitch, params.c, {
 				scalex: params.scalex,
 				scaley: params.scaley,
