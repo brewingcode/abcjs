@@ -28,7 +28,7 @@ var parseDirective = {};
 		multilineVars.repeatfont  = { face: "\"Times New Roman\"", size: 13, weight: "normal", style: "normal", decoration: "none" };
 		multilineVars.textfont  = { face: "\"Times New Roman\"", size: 16, weight: "normal", style: "normal", decoration: "none" };
 		multilineVars.tripletfont = {face: "Times", size: 11, weight: "normal", style: "italic", decoration: "none"};
-		multilineVars.vocalfont  = { face: "\"Times New Roman\"", size: 13, weight: "bold", style: "normal", decoration: "none" };
+		multilineVars.vocalfont  = { face: "\"Times New Roman\"", size: 10, weight: "normal", style: "normal", decoration: "none" };
 		multilineVars.wordsfont  = { face: "\"Times New Roman\"", size: 16, weight: "normal", style: "normal", decoration: "none" };
 
 		// These fonts are global for the entire tune.
